@@ -1,0 +1,6 @@
+first-name: peter
+email: peter@gmail.com
+cloudtrail: true
+billing: true 
+config: false
+threshold: 100
