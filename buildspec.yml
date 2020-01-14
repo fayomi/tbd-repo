@@ -1,0 +1,26 @@
+version: 0.2
+
+env:
+  variables:
+    STACKSET: enable-config 
+    ACCOUNT_ID: 082803337406
+    REGIONS: eu-west-1
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - echo "python installed"
+  build:
+    commands:
+      - echo "This is a test build"
+      # - ./enable-config.sh $STACKSET $ACCOUNT_ID $REGIONS
+      - cd $CODEBUILD_SRC_DIR_SourceArtifact
+      - touch file1
+
+artifacts:
+  secondary-artifacts:
+    artifact1:
+      base-directory: $CODEBUILD_SRC_DIR_SourceArtifact
+      files:
+        - file1
