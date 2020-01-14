@@ -17,6 +17,7 @@ phases:
       # - ./enable-config.sh $STACKSET $ACCOUNT_ID $REGIONS
       - cd $CODEBUILD_SRC_DIR_SourceArtifact
       - touch file1
+      - cat $CODEBUILD_SRC_DIR_SourceArtifact/file1
 
 artifacts:
   secondary-artifacts:
