@@ -15,12 +15,12 @@ phases:
     commands:
       - echo "This is a test build"
       # - ./enable-config.sh $STACKSET $ACCOUNT_ID $REGIONS
-      - touch file1
-      - cat file1
+      - ls $CODEBUILD_SRC_DIR
+      # - cat file1
 
-artifacts:
-  secondary-artifacts:
-    artifact1:
-      base-directory: $CODEBUILD_SRC_DIR
-      files:
-        - file1
+# artifacts:
+#   secondary-artifacts:
+#     artifact1:
+#       base-directory: $CODEBUILD_SRC_DIR
+#       files:
+#         - file1
