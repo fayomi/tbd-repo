@@ -3,4 +3,4 @@ email: john@gmail.com
 cloudtrail: true
 billing: true 
 config: false
-threshold: 100
+threshold: 1000
