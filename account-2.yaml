@@ -1,6 +1,0 @@
-first-name: john
-email: john@gmail.com
-cloudtrail: true
-billing: true 
-config: false
-threshold: 100

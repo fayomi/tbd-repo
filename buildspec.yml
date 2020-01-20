@@ -16,6 +16,7 @@ phases:
       - echo "This is a test build"
       # - ./enable-config.sh $STACKSET $ACCOUNT_ID $REGIONS
       - ls $CODEBUILD_SRC_DIR
+      
       # - cat file1
 
 # artifacts:

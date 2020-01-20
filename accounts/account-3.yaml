@@ -1,0 +1,7 @@
+first-name: sarahj
+email: sarah@gmail.com
+cloudtrail: true
+billing:
+  enabled: true 
+  threshold: 100
+config: false
