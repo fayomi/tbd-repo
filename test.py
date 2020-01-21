@@ -8,17 +8,19 @@ client = boto3.client('ssm')
 directory = os.listdir('./accounts')
 
 # IF ACCOUNT IS NEW 
-    # Get the new account config.yaml and send it to s3 bucket
-    # trigger a stackset that builds the account
-    # SEND IT TO ACCOUNT CREATION BUILD
+    # Get the new account config.yaml and send the account name, ou name and email to stackset 
+    # This creates an account and outputs account id
+    # After the output is generated the next stackset is triggered, this configures the account based on things enabled in the yaml
+    # Once this is complete the yaml file is hashed and the name and hash number are stored in parameter store
+    # This parameter store is tagged with the account id and ou name
 
 
 # IF ACCOUNT HAS BEEN UPDATED 
-# get the account config.yaml
-# get account ID and run stackset with updates
-# start build connected to that repo to update stack
-# 
-# SEND IT TO ACCOUNT 
+    # Get the account ID by searching the parameter store by  file name and searching the tags
+    # Once account ID is retrieved the config yaml file is processed to extract the new data
+    # The account provisioning stackset can be run to update the account with new configs
+    # Once successfully updated the new file is hashed and the parameter store is updated with the new hash
+
 
 # This scans to get all the data from the repo
 file_dictionary = {}
@@ -114,3 +116,8 @@ else:
     else:
         print("Nothing was updated")
 
+
+
+    # if a yaml config file is deleted from repo
+    # check organizational status to see if account is 'Suspended'
+    # then delete account from aparameter store
