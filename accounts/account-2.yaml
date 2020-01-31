@@ -1,6 +1,6 @@
-first-name: john
-email: john@gmail.com
+name: talitha
+email: talitha5@nmagazinec.com
 cloudtrail: true
 billing: false 
 config: false
-threshold: 100
+threshold: 1000

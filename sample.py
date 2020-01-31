@@ -1,22 +1,23 @@
+import boto3
+import json
+
+
+lambda_client = boto3.client('lambda')
+
+payload2 = {'Test': 'Account'}
 
 
 
+# Test lambda invocation
 
-
-
-
-def func_one():
-    print("first function")
-
-
-def func_two():
-    print("second function")
-
-
-def main_func():
-    func_one()
-    func_two()
-
-
-
-main_func()
+response = lambda_client.invoke(
+    FunctionName='test',
+    # InvocationType='Event'|'RequestResponse'|'DryRun',
+    # LogType='None'|'Tail',
+    # ClientContext='string',
+    Payload=json.dumps(payload2)
+    # Qualifier='string'
+)
+payload = response['Payload'].read().decode("utf-8")
+payload_json = json.loads(payload)
+print(payload_json["body"])

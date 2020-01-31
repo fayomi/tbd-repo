@@ -2,9 +2,12 @@ import os
 from subprocess import Popen, PIPE
 import boto3
 import yaml
+import json
 
-ssm = boto3.ssm('ssm')
+ssm = boto3.client('ssm')
 cloudformation = boto3.client('cloudformation')
+lambda_client = boto3.client('lambda')
+function_name = "account-creation-test"
 
 create_stack_template_url = "https://dwp-test-create-account.s3-eu-west-1.amazonaws.com/simple-cf.yaml" #to be changed in test account
 module_name = "create-account"
@@ -62,84 +65,141 @@ if len(difference) > 0:
         account_name = config_list['name']
         account_email = config_list['email']
         ou_name = config_list['name']
-        stack_name = "create-account-" + account_name
+        # stack_name = "create-account-" + account_name
+
+        payload = {
+            "account_name" : account_name,
+            "account_email" : account_email,
+            "ou_name" : ou_name
+        }
 
         # Create new account
-        response = client.create_stack(
-            StackName=stack_name,
-            # TemplateBody='string',
-            TemplateURL=create_stack_template_url,
-            Parameters=[
-                {
-                    'ParameterKey': 'AccountName',
-                    'ParameterValue': account_name,
-                    'UsePreviousValue': False,
-                    # 'ResolvedValue': 'string'
-                },
-                {
-                    'ParameterKey': 'Email',
-                    'ParameterValue': account_email,
-                    'UsePreviousValue': False,
-                    # 'ResolvedValue': 'string'
-                },
-                {
-                    'ParameterKey': 'ModuleName',
-                    'ParameterValue': module_name
-                    'UsePreviousValue': False,
-                    # 'ResolvedValue': 'string'
-                },
-                {
-                    'ParameterKey': 'OUName',
-                    'ParameterValue': ou_name
-                    'UsePreviousValue': False,
-                    # 'ResolvedValue': 'string'
-                },
-                {
-                    'ParameterKey': 'S3Bucket',
-                    'ParameterValue': account_creation_lambda_s3_bucket_name,
-                    'UsePreviousValue': False,
-                    # 'ResolvedValue': 'string'
-                },
-                {
-                    'ParameterKey': 'S3Key',
-                    'ParameterValue': account_creation_lambda_s3_bucket_key,
-                    'UsePreviousValue': False,
-                    # 'ResolvedValue': 'string'
-                },
-            ],
-            # DisableRollback=True|False,
-            # RollbackConfiguration={
-            #     'RollbackTriggers': [
-            #         {
-            #             'Arn': 'string',
-            #             'Type': 'string'
-            #         },
-            #     ],
-            #     'MonitoringTimeInMinutes': 123
-            # },
-            # TimeoutInMinutes=123,
-            # NotificationARNs=[
-            #     'string',
-            # ],
-            Capabilities=[
-                'CAPABILITY_NAMED_IAM'
-            ],
-            # ResourceTypes=[
-            #     'string',
-            # ],
-            # RoleARN='string',
-            # OnFailure='DO_NOTHING'|'ROLLBACK'|'DELETE',
-            # StackPolicyBody='string',
-            # StackPolicyURL='string',
-            # Tags=[
-            #     {
-            #         'Key': 'string',
-            #         'Value': 'string'
-            #     },
-            # ],
-            # ClientRequestToken='string',
-            # EnableTerminationProtection=True|False
+
+        response = lambda_client.invoke(
+            FunctionName=function_name,
+            # InvocationType='Event'|'RequestResponse'|'DryRun',
+            # LogType='None'|'Tail',
+            # ClientContext='string',
+            Payload=json.dumps(payload)
+            # Qualifier='string'
         )
+        payload = response['Payload'].read().decode("utf-8")
+        payload_json = json.loads(payload)
+        print(payload_json)
+
+
+
+
+
+
+
+
+
+
+
+        # response = cloudformation.create_stack(
+        #     StackName=stack_name,
+        #     # TemplateBody='string',
+        #     TemplateURL=create_stack_template_url,
+        #     Parameters=[
+        #         {
+        #             'ParameterKey': 'AccountName',
+        #             'ParameterValue': account_name,
+        #             'UsePreviousValue': False,
+        #             # 'ResolvedValue': 'string'
+        #         },
+        #         {
+        #             'ParameterKey': 'Email',
+        #             'ParameterValue': account_email,
+        #             'UsePreviousValue': False,
+        #             # 'ResolvedValue': 'string'
+        #         },
+        #         {
+        #             'ParameterKey': 'ModuleName',
+        #             'ParameterValue': module_name,
+        #             'UsePreviousValue': False,
+        #             # 'ResolvedValue': 'string'
+        #         },
+        #         {
+        #             'ParameterKey': 'OUName',
+        #             'ParameterValue': ou_name,
+        #             'UsePreviousValue': False,
+        #             # 'ResolvedValue': 'string'
+        #         },
+        #         {
+        #             'ParameterKey': 'S3Bucket',
+        #             'ParameterValue': account_creation_lambda_s3_bucket_name,
+        #             'UsePreviousValue': False,
+        #             # 'ResolvedValue': 'string'
+        #         },
+        #         {
+        #             'ParameterKey': 'S3Key',
+        #             'ParameterValue': account_creation_lambda_s3_bucket_key,
+        #             'UsePreviousValue': False,
+        #             # 'ResolvedValue': 'string'
+        #         },
+        #     ],
+        #     # DisableRollback=True|False,
+        #     # RollbackConfiguration={
+        #     #     'RollbackTriggers': [
+        #     #         {
+        #     #             'Arn': 'string',
+        #     #             'Type': 'string'
+        #     #         },
+        #     #     ],
+        #     #     'MonitoringTimeInMinutes': 123
+        #     # },
+        #     # TimeoutInMinutes=123,
+        #     # NotificationARNs=[
+        #     #     'string',
+        #     # ],
+        #     Capabilities=[
+        #         'CAPABILITY_NAMED_IAM'
+        #     ],
+        #     # ResourceTypes=[
+        #     #     'string',
+        #     # ],
+        #     # RoleARN='string',
+        #     # OnFailure='DO_NOTHING'|'ROLLBACK'|'DELETE',
+        #     # StackPolicyBody='string',
+        #     # StackPolicyURL='string',
+        #     # Tags=[
+        #     #     {
+        #     #         'Key': 'string',
+        #     #         'Value': 'string'
+        #     #     },
+        #     # ],
+        #     # ClientRequestToken='string',
+        #     # EnableTerminationProtection=True|False
+        # )
+
+        # print(response)
+
+    # ACCOUNT CREATION LAMBDA NEEDS TO HAVE THE STACKSET EXECUTION ROLE APPLIED TO IT
+
+
+
+
+
+
+
+        # stack_id = response["StackId"]
+        # stack_events = client.describe_stack_events(
+        #     StackName=stack_id,
+        #     # NextToken='string'
+        # )
+        # events = stack_events["StackEvents"]
+        # for event in events:
+        #     if event["LogicalResourceId"] == stack_name and event["ResourceStatus"] == "CREATE_COMPLETE":
+        #         stack_output = cloudformation.describe_stacks(
+        #             StackName=stack_name,
+        #             # NextToken='string'
+        #         )
+        #         print(stack_output)
+        #     else if event["ResourceStatus"] != "CREATE_COMPLETE" or event["ResourceStatus"] != "CREATE_IN_PROGRESS":
+
+
+
 
 
     # # hash the file
